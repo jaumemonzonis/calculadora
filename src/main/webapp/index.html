@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>p01cs_casa</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
+    </head>
+    <body>
+        <div class="container">
+            <div class="col-md-6 col-md-offset-3 text-center">
+                <h2 class="bg-info">EJERCICIO CALCULADORA</h2>
+                <h4>Introduce los numeros a calcular:</h4>
+                <!--<button type="button" name="enviar" value="Enviar" id="llenar" class="btn btn-success" >Enviar</button>-->
+                <form id="form" action="/calculadora/table" method="GET">
+                    <div id="divAncho" class="form-group">
+                        <label for="ancho">Numero 1</label>
+                        <input id="num1" type="text" class="form-control" name="num1"><!-- required -->
+                        <div id="errorNum1"></div>
+                    </div>	
+                    <div id="divAlto" class="form-group">
+                        <label for="alto">Numero 2</label>
+                        <input id="num2" type="text" class="form-control" name="num2"><!-- required -->
+                        <div id="errorNum2"></div>
+                    </div>
+
+
+
+                    <label for="sel">Selecciona operación:</label>
+                    <select class="form-control" id="sel" name="sel">
+                        <option id="sumar">sumar</option>
+                        <option id="restar">restar</option>
+                        <option id="mult">multiplicar</option>
+                        <option id="divi">dividir</option>
+                    </select>
+                    <hr>
+
+                    <input id="btn" type="button" class="btn btn-primary" value="Enviar" name="enviar">
+                    <input id="btnl" type="button" class="btn btn-primary" value="Limpiar" name="limpiar">
+
+                </form>
+                <hr>
+                <label for="resultado">Resultado</label>
+                <div id="alerta" class="alert alert-success"></div>
+                <div id="errorServidor"></div>
+
+            </div>
+        </div>
+        <script>
+            $(document).ready(function () {
+
+                 $('#btn').prop('disabled', true);
+               
+
+
+                // VALIDAR RANGO
+                const min = 0;
+                const max = 100;
+
+                $(document).on('keyup', '#num1', function () {
+                    var self = $(this);
+                    var value = self.val();
+                    if (value < min || value > max) {
+
+                        $("#errorNum1").attr("class", "alert alert-danger");
+                        $("#errorNum1").empty().append("Error!!!. Introduce un numero entre el rango 1 y 100.");
+                        $('#btn').prop('disabled', true);
+                    } else {
+                        $('#btn').prop('disabled', false);
+                    }
+                });
+
+                $(document).on('keyup', '#num2', function () {
+                    var self = $(this);
+                    var value = self.val();
+                    if (value < min || value > max) {
+
+                        $("#errorNum2").attr("class", "alert alert-danger");
+                        $("#errorNum2").empty().append("Error!!!. Introduce un numero entre el rango 1 y 100.");
+                        $('#btn').prop('disabled', true);
+                    } else {
+                        $('#btn').prop('disabled', false);
+                    }
+                });
+
+                $("#num1").keyup(function () {
+                    var initVal = $(this).val();
+                    outputVal = initVal.replace(/[^0-9\.]/g, "").replace(/^\./, "");
+                    if (initVal !== outputVal) {
+                        $(this).val(outputVal);
+                        $("#errorNum1").attr("class", "alert alert-danger");
+                        $("#errorNum1").empty().append("Error. Introduce un numero.");
+                        $('#btn').prop('disabled', true);
+                    } else {
+                        $('#btn').prop('disabled', false);
+                    }
+                });
+
+                $("#num2").keyup(function () {
+                    var initVal = $(this).val();
+                    outputVal = initVal.replace(/[^0-9\.]/g, "").replace(/^\./, "");
+                    if (initVal !== outputVal) {
+                        $(this).val(outputVal);
+                        $("#errorNum2").attr("class", "alert alert-danger");
+                        $("#errorNum2").empty().append("Error. Introduce un numero.");
+                        $('#btn').prop('disabled', true);
+                    } else {
+                        $('#btn').prop('disabled', false);
+                    }
+                });
+
+
+
+
+                $("#btn").click(function () {
+                    $.ajax({
+                        url: $("#form").attr("action"), //$("#form").attr("action"), //"/calculadora/table?num1=5&num2=4&sel=sumar",
+                        cache: false,
+                        method: $("#form").attr("method"), //"get",
+                        data: $("#form").serialize(),
+                        dataType: "json",
+                        success: function (data) {
+
+                            $("#alerta").empty().append(JSON.stringify(data));
+                        },
+                        error: function (data) {
+                            //var cadena=JSON.stringify(data);
+
+
+                            var msj = "Mensaje del servidor: " + data.responseJSON.mensaje + "</br> Numero 1: "
+                                    + data.responseJSON.num1 + "</br>Numero 2: " + data.responseJSON.num2;
+                            $("#errorServidor").attr("class", "alert alert-danger");
+                            $("#errorServidor").empty().append(msj);
+                            $("#alerta").empty();
+
+                        }
+
+                    });
+                });
+
+                $("#btnl").click(function () {
+                 
+                    $("#alerta").empty();
+                
+                    $("#num1").val('');
+                    $("#num2").val('');
+                    $("#errorNum1").attr("class", "");
+                    $("#errorNum2").attr("class", "");
+                    $("#errorNum1").empty();
+                    $("#errorNum2").empty();
+                    $("#errorServidor").empty();
+                    $("#errorServidor").attr("class", "");
+
+                    $("#btn").attr("disabled", true);
+
+
+                });
+
+
+
+
+            });
+
+        </script>
+    </body>
+</html>
