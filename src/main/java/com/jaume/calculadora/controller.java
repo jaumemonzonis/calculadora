@@ -42,6 +42,10 @@ public class controller extends HttpServlet {
         double res=0;
         
         // validar numerico
+        
+        
+        //ejemplo etiqueta
+        
         try {
            
            num1 = Double.parseDouble(request.getParameter("num1"));
